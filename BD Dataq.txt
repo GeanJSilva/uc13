@@ -1,0 +1,131 @@
+create DATABASE Dataq;
+
+use Dataq;
+
+create TABLE paciente(
+	cpf varchar(14) primary key,
+	nome_paciente varchar(40) not null,
+	telefone varchar(14) not null,
+	numero_plano int not null,
+	nome_plano varchar(20) not null,
+	tipo_plano varchar(10) not null
+	)
+
+create TABLE medico(
+	crm int primary key,
+	nome_medico varchar(30) not null,
+	especialidade varchar(20) not null
+	)
+
+create TABLE exame(
+	codigo int primary key,
+	especificacao varchar(20) not null,
+	preco money not null
+)
+
+--AUTO INCREMENTO NO SQLSERVE:
+--IDENTITY (<numero inicial>, <contador>)
+
+create TABLE consulta(
+	numero_consulta int identity(23000,1) primary key,
+	data_exame date,
+	horario_consulta time,
+	fk_paciente_cpf varchar(14),
+	fk_medico_crm int
+)
+
+create TABLE pedido_exame(
+	numero_pedido int identity(2300,1)primary key, 
+	resultado varchar(40) not null,
+	data_exame date,
+	valor_pagar money,
+	fk_consulta_numero_consulta int,
+	fk_exame_codigo int,
+)
+--Para Adicionar chaves estrangeiras às tabelas:
+
+ALTER TABLE pedido_exame ADD CONSTRAINT fk_pedido_exame_2
+FOREIGN KEY (fk_consulta_numero_consulta)
+REFERENCES consulta (numero_consulta)
+ON DELETE CASCADE;
+
+ALTER TABLE pedido_exame ADD CONSTRAINT fk_pedido_exame_3
+FOREIGN KEY (fk_exame_codigo)
+REFERENCES exame (codigo);
+--ON DELETE RESTRICT;
+
+ALTER TABLE consulta ADD CONSTRAINT fk_consulta_2
+FOREIGN KEY (fk_paciente_cpf)
+REFERENCES paciente (cpf)
+ON DELETE CASCADE;
+
+ALTER TABLE consulta ADD CONSTRAINT fk_consulta_3
+FOREIGN KEY (fk_medico_crm)
+REFERENCES medico (crm)
+ON DELETE CASCADE;
+
+--inserir dados (popular):
+
+--inserindo dados na tabela paciente:
+
+insert into paciente values('14725836914','gean','(82)147258369',147,'penacova saude','pleno');
+insert into paciente values('14725836917','joao','(82)147258361',146,'quasela coop','standard');
+insert into paciente values('14725836912','araujo','(82)147258362',666,'sus','unico');
+insert into paciente values('14725836915','silva','(82)147258365',20,'vixi med','meieiro');
+
+select * from paciente
+------------------------------
+
+--inserindo dados na tabela medico:
+
+insert into medico values(321,'hans chucrute','cirurgia geral');
+insert into medico values(654,'house','podologia');
+insert into medico values(987,'who','neurologia');
+
+select * from medico
+------------------------------
+
+--inserindo dados na tabela exames:
+
+insert into exame values(1040,'hemograma',40.00);
+insert into exame values(1047,'tomografia',200.00);
+insert into exame values(1220,'radiografia',50.00);
+insert into exame values(1070,'ultrasonografia',150.00);
+
+select * from exame
+-------------------------------
+
+--inserindo dados na tabela consultas:
+
+--(valores com auto incremento nao devem ser inseridos)
+insert into consulta values('2023/03/15','10:30','14725836914',321);
+insert into consulta values('2023/03/15','11:30','14725836917',654);
+insert into consulta values('2023/03/15','13:30','14725836912',987);
+
+select * from consulta
+-------------------------------
+--inserindo dados na tabela pedido_exames:
+
+insert into pedido_exame values ('inconclusivo','2023/03/15',50.00,23000,1040);
+insert into pedido_exame values ('normal','2023/03/15',200.00,23001,1047);
+insert into pedido_exame values ('normal','2023/03/15',40.00,23000,1220);
+
+
+select * from pedido_exame
+----------------------------------
+
+--alteracoes de dados:
+
+select * from paciente;
+update paciente set nome_paciente = 'Gean Silva' where cpf= 14725836914;
+select * from paciente;
+
+---------------------------------
+
+--exclusao de dados:
+
+select * from paciente;
+delete from paciente where cpf= 14725836912;
+select * from paciente;
+
+--------------------------------
