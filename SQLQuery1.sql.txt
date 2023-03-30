@@ -1,0 +1,108 @@
+
+---------------------------------------DDL---------------------------------------------------
+
+---------------Criar banco de dados----------------
+create DATABASE bdDataq_RPG
+go
+
+use bdDataq_RPG
+go
+
+---------------Criar tabelas-----------------------
+--(primeiro criar tabelas sem chaves estrangeiras)
+--(identity = auto incremento no sql)
+--(unique = nao repetir dados no cadastro)
+
+create TABLE Usuarios(
+	IdUsuario int primary key identity,
+	NomeUsuario varchar(40) not null,
+	Senha varchar(255) not null,
+	Telefone varchar(20)not null,
+	Email varchar (40) unique not null,
+)
+go
+
+create TABLE Classes(
+	IdClasse int primary key identity,
+	Tipo varchar (30) unique not null,
+	DescricaoClasse varchar (255),
+)
+go
+
+--Tabelas com chave estrangeira:
+
+create TABLE Personagens(
+	IdPersonagem int primary key identity,
+	NomePersonagem varchar (30) unique not null,
+--(abaixo o UNIQUE restringe o usuario a 1 personagem)
+	fk_IdUsuario int unique foreign key references Usuarios(IdUsuario),
+	fk_IdClasse int foreign key references Classes(IdClasse)
+)
+go
+
+create TABLE Habilidades(
+	IdHAbilidade int primary key identity,
+	NomeHabilidade varchar (40) unique not null,
+	DescricaoHabilidade varchar (255)
+)
+go
+
+--Tabela criada para relacionar (n,n):
+
+create TABLE ClassesHabilidades(
+	fk_IdClasse int foreign key references Classes(IdClasse),
+	fk_IdHabilidade int foreign key references Habilidades(IdHabilidade)
+)
+go
+
+-------------------------------------FIM DO DLL------------------------------------------------
+
+---------------------------------------DML/ DQL------------------------------------------------
+
+--INSERIR DADOS NAS TABELAS:
+
+--(caso queira alterar a ordem da inserção ou pular algum atributo que nao seja not null):
+insert into Usuarios (Senha,NomeUsuario,Email,Telefone) values ('321654','Joao Silva','joao@email.com','(81)9999-8888')
+
+insert into Usuarios values ('Gean Silva', '123456','(82)999999999','gean@email.com')
+insert into Classes values ('Necromante','descrição de necromante')
+insert into Classes values ('Barbaro', 'descricao de barbaro')
+insert into Habilidades values ('Recuperar Vida', 'Descricao'),('lança mortal','Descricao de lança mortal'),('Escudo Supremo','')
+
+--(para inserir dados em tabelas com FK, primeiro consulta qual a fk no banco pelo SELECT):
+insert into Personagens values ('Debug',1,1)
+insert into ClassesHabilidades values (1,2),(1,1)
+insert into Personagens values ('Kill3R',2,2)
+insert into ClassesHAbilidades values (2,3), (2,1)
+
+--ALTERAR TABELA:
+
+update Usuarios set senha = '789465' where IdUsuario = 1
+
+
+--CONSULTAR DADOS DAS TABELAS:
+
+select * from Usuarios
+select * from Classes
+select * from Habilidades
+select * from Personagens
+select * from ClassesHabilidades
+
+select IdUsuario, Email from Usuarios
+select IdUsuario, Email from Usuarios where IdUsuario = 1
+
+
+--Juntar informacoes de 2 ou mais tabelas:
+select * from Personagens 
+join Usuarios
+on Personagens.fk_IdUsuario = Usuarios.IdUsuario
+
+
+--abraviacoes para nomes da tabela:
+select P.NomePersonagem, U.Email from Personagens P 
+join Usuarios U
+on P.fk_IdUsuario = U.IdUsuario
+
+
+
+----------------------------------FIM DO DML/DQL------------------------------------------	
